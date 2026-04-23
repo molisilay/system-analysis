@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧設備維保平台 — 系統盤點報告</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#1a1d27;--bg3:#222534;--border:#2e3347;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --blue:#3b82f6;--blue-dim:#1e3a5f;
+  --green:#22c55e;--green-dim:#14532d;
+  --yellow:#f59e0b;--yellow-dim:#451a03;
+  --red:#ef4444;--red-dim:#450a0a;
+  --purple:#a855f7;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Microsoft JhengHei',system-ui,sans-serif;font-size:14px;line-height:1.6;}
+a{text-decoration:none;color:inherit;}
+
+.hdr{background:linear-gradient(135deg,#1e2740 0%,#0f1117 60%);border-bottom:1px solid var(--border);padding:28px 48px 22px;}
+.hdr h1{font-size:22px;font-weight:700;color:#fff;}
+.hdr p{color:var(--text2);margin-top:4px;font-size:13px;}
+.badge-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.badge{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;}
+.b-blue{background:var(--blue-dim);color:#93c5fd;border:1px solid #1d4ed8;}
+.b-green{background:var(--green-dim);color:#86efac;border:1px solid #166534;}
+.b-yellow{background:var(--yellow-dim);color:#fcd34d;border:1px solid #92400e;}
+
+main{max-width:1100px;margin:0 auto;padding:36px 48px 80px;}
+
+/* overview cards */
+.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;}
+.ov-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.ov-card .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);}
+.ov-card .val{font-size:30px;font-weight:700;margin-top:2px;}
+.ov-card .sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.ov-c-g .val{color:var(--green);}
+.ov-c-y .val{color:var(--yellow);}
+.ov-c-r .val{color:var(--red);}
+.ov-c-b .val{color:var(--blue);}
+
+/* table */
+.mod-table{width:100%;border-collapse:collapse;}
+.mod-table thead tr{background:var(--bg3);}
+.mod-table th{text-align:left;padding:9px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border-bottom:1px solid var(--border);}
+.mod-table td{padding:0;border-bottom:1px solid var(--border);}
+.mod-table tr.phase-hdr td{background:transparent;padding:0;}
+.phase-hdr-inner{padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;}
+
+/* row link */
+.mod-row{display:table-row;cursor:pointer;}
+.mod-row td{padding:13px 14px;transition:background .12s;}
+.mod-row:hover td{background:rgba(59,130,246,.06);}
+.mod-row:last-child td{border-bottom:none;}
+.mod-name{font-weight:700;color:#fff;font-size:13px;}
+.mod-sub{color:var(--text3);font-size:11px;margin-top:2px;}
+.mod-gap{color:var(--text2);font-size:12px;}
+.pbar-wrap{display:flex;align-items:center;gap:8px;}
+.pbar-bg{flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:99px;}
+.pct-txt{font-size:13px;font-weight:700;min-width:34px;text-align:right;}
+.phase-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;}
+.pt-0{background:#312e81;color:#a5b4fc;}
+.pt-1{background:#064e3b;color:#6ee7b7;}
+.pt-2{background:#78350f;color:#fcd34d;}
+.pt-3{background:#4c0519;color:#fda4af;}
+.fill-g{background:var(--green);}
+.fill-b{background:var(--blue);}
+.fill-y{background:var(--yellow);}
+.fill-r{background:var(--red);}
+.fill-p{background:var(--purple);}
+
+@media(max-width:768px){
+  main{padding:24px 20px 60px;}
+  .hdr{padding:20px;}
+  .ov-grid{grid-template-columns:repeat(2,1fr);}
+  .mod-table th:nth-child(3),.mod-table td:nth-child(3){display:none;}
+}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>智慧設備維保平台 — 系統盤點報告</h1>
+  <p>點擊模組列查看詳細進度與實作規劃 · 2026-04-23</p>
+  <div class="badge-row">
+    <span class="badge b-blue">現有系統：Intelligent-Inspection-Platform</span>
+    <span class="badge b-green">目標：智慧設備維保與備品協同管理平台 v2.0</span>
+    <span class="badge b-yellow">整體完成度 ~32%</span>
+  </div>
+</div>
+
+<main>
+  <div class="ov-grid">
+    <div class="ov-card ov-c-g"><div class="lbl">已有功能模組</div><div class="val">9</div><div class="sub">具備部分功能</div></div>
+    <div class="ov-card ov-c-y"><div class="lbl">整體完成度</div><div class="val">32%</div><div class="sub">對應藍圖 Phase 1 約 60%</div></div>
+    <div class="ov-card ov-c-r"><div class="lbl">完全缺失模組</div><div class="val">3</div><div class="sub">M5 備品 / M6 採購 / IoT</div></div>
+    <div class="ov-card ov-c-b"><div class="lbl">預估補全時程</div><div class="val">12mo</div><div class="sub">Phase 1+2 完整補全</div></div>
+  </div>
+
+  <table class="mod-table" id="mod-table">
+    <thead>
+      <tr>
+        <th style="width:260px;">模組</th>
+        <th style="width:180px;">完成度</th>
+        <th>核心缺口</th>
+        <th style="width:80px;">階段</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</main>
+
+<script src="modules-data.js"></script>
+<script>
+const phaseInfo = {
+  0:{label:'Phase 0 · 資料治理先行（2~4 週）',   rowBg:'rgba(99,102,241,.08)',  color:'#a5b4fc', cls:'pt-0'},
+  1:{label:'Phase 1 · 基礎建設（3~5 個月）',     rowBg:'rgba(34,197,94,.06)',   color:'#6ee7b7', cls:'pt-1'},
+  2:{label:'Phase 2 · 整合升級（3~4 個月）',     rowBg:'rgba(245,158,11,.06)',  color:'#fcd34d', cls:'pt-2'},
+  3:{label:'Phase 3 · 智慧升級（4~6 個月）',     rowBg:'rgba(239,68,68,.06)',   color:'#fda4af', cls:'pt-3'},
+};
+
+const tbody = document.getElementById('tbody');
+let lastPhase = -1;
+
+MODULES.forEach(m => {
+  if (m.phase !== lastPhase) {
+    lastPhase = m.phase;
+    const pi = phaseInfo[m.phase];
+    const hdr = document.createElement('tr');
+    hdr.className = 'phase-hdr';
+    hdr.innerHTML = `<td colspan="4"><div class="phase-hdr-inner" style="background:${pi.rowBg};color:${pi.color};">${pi.label}</div></td>`;
+    tbody.appendChild(hdr);
+  }
+
+  const pctColor = m.pct>=70?'var(--green)':m.pct>=30?'var(--blue)':m.pct>0?'var(--yellow)':'var(--red)';
+  const pi = phaseInfo[m.phase];
+  const tr = document.createElement('tr');
+  tr.className = 'mod-row';
+  tr.innerHTML = `
+    <td>
+      <div class="mod-name">${m.title}</div>
+      <div class="mod-sub">${m.sub}</div>
+    </td>
+    <td>
+      <div class="pbar-wrap">
+        <div class="pbar-bg"><div class="pbar-fill ${m.fillCls}" style="width:${m.pct}%"></div></div>
+        <span class="pct-txt" style="color:${pctColor}">${m.pct}%</span>
+      </div>
+    </td>
+    <td><span class="mod-gap">${m.gap}</span></td>
+    <td><span class="phase-tag ${pi.cls}">${pi.cls==='pt-0'?'Phase 0':pi.cls==='pt-1'?'Phase 1':pi.cls==='pt-2'?'Phase 2':'Phase 3'}</span></td>
+  `;
+  tr.addEventListener('click', () => {
+    window.location.href = `module-detail.html#${m.id}`;
+  });
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
