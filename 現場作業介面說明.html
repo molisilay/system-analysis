@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>現場作業介面說明 — 智慧點檢平台</title>
+<style>
+:root{
+  --bg:#f8fafc;--bg2:#fff;--border:#e2e8f0;
+  --text:#1e293b;--text2:#475569;--text3:#94a3b8;
+  --blue:#3b82f6;--blue-light:#eff6ff;--blue-dim:#dbeafe;
+  --green:#16a34a;--green-light:#f0fdf4;--green-dim:#dcfce7;
+  --yellow:#d97706;--yellow-light:#fffbeb;--yellow-dim:#fef3c7;
+  --red:#dc2626;--red-light:#fef2f2;--red-dim:#fee2e2;
+  --gray-light:#f1f5f9;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Microsoft JhengHei',system-ui,sans-serif;font-size:14px;line-height:1.6;}
+
+/* 主導覽列（跨分頁切換） */
+.main-nav{
+  background:#0f172a;color:#fff;padding:0 48px;height:48px;
+  display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:60;
+  border-bottom:1px solid #1e293b;
+}
+.main-nav-brand{font-size:13px;font-weight:700;color:#cbd5e1;margin-right:32px;display:flex;align-items:center;gap:8px;}
+.main-nav-brand::before{content:"";display:inline-block;width:6px;height:14px;background:var(--blue);border-radius:2px;}
+.main-nav a{
+  color:#94a3b8;font-size:13px;font-weight:500;text-decoration:none;
+  padding:0 18px;height:48px;display:flex;align-items:center;
+  border-bottom:2px solid transparent;transition:all .15s;
+}
+.main-nav a:hover{color:#fff;}
+.main-nav a.active{color:#fff;background:rgba(59,130,246,.15);border-bottom-color:var(--blue);}
+.main-nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:11px;color:#64748b;}
+
+.page-hdr{background:#1e2d4a;color:#fff;padding:28px 48px 24px;}
+.page-hdr h1{font-size:20px;font-weight:700;}
+.page-hdr p{color:#94a3b8;font-size:13px;margin-top:4px;}
+.tag-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.tag{padding:3px 12px;border-radius:99px;font-size:11px;font-weight:600;}
+.tag-blue{background:rgba(59,130,246,.2);color:#93c5fd;border:1px solid rgba(59,130,246,.4);}
+.tag-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);}
+.tag-yellow{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);}
+
+.topnav{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:0 48px;display:flex;align-items:center;gap:24px;
+  position:sticky;top:48px;z-index:50;overflow-x:auto;
+}
+.nav-link{
+  padding:14px 0;font-size:13px;font-weight:500;color:var(--text2);
+  border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;
+  text-decoration:none;white-space:nowrap;
+}
+.nav-link:hover{color:var(--blue);}
+.nav-link.active{color:var(--blue);border-bottom-color:var(--blue);}
+
+main{max-width:1060px;margin:0 auto;padding:36px 48px 80px;}
+.section{margin-bottom:52px;}
+.section-title{
+  font-size:17px;font-weight:700;color:var(--text);
+  padding-bottom:12px;border-bottom:2px solid var(--border);
+  margin-bottom:24px;display:flex;align-items:center;gap:8px;
+}
+.section-title .num{
+  width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;
+}
+
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.illus-block{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:20px 22px;margin-bottom:20px;
+}
+.illus-block-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.illus-block-title{font-size:15px;font-weight:700;color:var(--text);}
+.illus-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;align-items:start;}
+.illus-img-wrap{
+  background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+  padding:8px;overflow:hidden;
+}
+.illus-img-wrap img{width:100%;display:block;border-radius:6px;}
+.illus-img-placeholder{
+  background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:8px;
+  padding:40px 16px;text-align:center;color:var(--text3);font-size:12px;
+}
+.illus-img-placeholder strong{color:var(--text2);display:block;margin-bottom:4px;font-size:13px;}
+.illus-img-caption{font-size:11px;color:var(--text3);margin-top:6px;text-align:center;}
+.illus-text{font-size:13px;color:var(--text2);line-height:1.8;}
+.illus-text p{margin-bottom:10px;}
+.illus-text b{color:var(--text);}
+.illus-text .hl-green{color:var(--green);font-weight:700;}
+.illus-text .hl-red{color:var(--red);font-weight:700;}
+@media(max-width:720px){.illus-grid{grid-template-columns:1fr;}}
+.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.feat-card-title{font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.feat-card-desc{font-size:13px;color:var(--text2);line-height:1.7;}
+.status-pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;}
+.s-done{background:var(--green-dim);color:var(--green);}
+.s-partial{background:var(--yellow-dim);color:var(--yellow);}
+.s-todo{background:var(--red-dim);color:var(--red);}
+.s-discuss{background:#e0e7ff;color:#4338ca;}
+
+.flow{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:8px;}
+.flow-step{display:flex;flex-direction:column;align-items:center;min-width:130px;flex-shrink:0;}
+.flow-box{
+  width:120px;padding:12px 10px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--bg2);text-align:center;font-size:12px;font-weight:600;color:var(--text);
+}
+.flow-box .icon{font-size:22px;margin-bottom:5px;}
+.flow-box.done{border-color:var(--green);background:var(--green-light);}
+.flow-box.partial{border-color:var(--yellow);background:var(--yellow-light);}
+.flow-arrow{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:18px;margin-top:30px;}
+.flow-label{font-size:10px;color:var(--text3);margin-top:6px;text-align:center;max-width:110px;}
+
+.mockup-wrap{background:#1e293b;border-radius:14px;padding:16px;max-width:420px;}
+.mockup-bar{background:#334155;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.mockup-bar-title{color:#f1f5f9;font-size:13px;font-weight:600;}
+.mockup-body{background:#f8fafc;border-radius:8px;padding:14px;font-size:12px;}
+.mockup-date-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.mockup-btn{padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;border:none;}
+.mockup-btn.active{background:#3b82f6;color:#fff;}
+.mockup-btn.idle{background:#e2e8f0;color:#475569;}
+.mockup-filter-row{display:flex;gap:6px;margin-bottom:10px;}
+.mockup-search{flex:1;padding:6px 10px;border-radius:7px;border:1px solid #e2e8f0;font-size:11px;color:#94a3b8;background:#fff;}
+.mockup-select{padding:6px 10px;border-radius:7px;border:1px solid #e2e8f0;font-size:11px;color:#475569;background:#fff;}
+.mockup-item{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+.mockup-item-title{font-weight:600;color:#1e293b;font-size:12px;margin-bottom:3px;}
+.mockup-item-meta{color:#94a3b8;font-size:11px;}
+.mockup-badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:600;margin-left:6px;}
+.mb-blue{background:#dbeafe;color:#1d4ed8;}
+.mb-orange{background:#fef3c7;color:#b45309;}
+
+.anno-table{width:100%;border-collapse:collapse;}
+.anno-table th{text-align:left;padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);background:var(--gray-light);border-bottom:1px solid var(--border);}
+.anno-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:top;}
+.anno-table tr:last-child td{border-bottom:none;}
+.anno-table td:first-child{font-weight:600;color:var(--text);white-space:nowrap;}
+.anno-table td .note{font-size:11px;color:var(--text3);margin-top:3px;font-weight:400;}
+
+.discuss-box{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:16px 18px;margin-top:16px;}
+.discuss-box-title{font-weight:700;font-size:13px;color:#92400e;margin-bottom:8px;}
+.discuss-box ul{padding-left:18px;}
+.discuss-box li{font-size:13px;color:#78350f;line-height:1.8;}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+.legend-dot{width:12px;height:12px;border-radius:3px;}
+
+@media(max-width:720px){
+  main{padding:24px 20px 60px;}
+  .page-hdr{padding:20px;}
+  .topnav{padding:0 20px;}
+  .feat-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav class="main-nav">
+  <div class="main-nav-brand">智慧點檢平台</div>
+  <a href="index.html">🗺️ 系統藍圖</a>
+  <a href="系統盤點分析報告.html">📊 系統盤點總覽</a>
+  <a href="現場作業介面說明.html" class="active">👷 現場作業介面</a>
+  <a href="系統管理與權限說明.html">🔐 系統管理與權限</a>
+  <div class="main-nav-right">2026-04-24</div>
+</nav>
+
+<div class="page-hdr">
+  <h1>現場作業介面 — 功能說明文件</h1>
+  <p>智慧點檢平台 · 現場人員（Frontline）視角 · 2026-04-24</p>
+  <div class="tag-row">
+    <span class="tag tag-blue">對象：現場作業人員</span>
+    <span class="tag tag-green">已確認功能：依程式碼為準</span>
+    <span class="tag tag-yellow">待確認：需與開發討論</span>
+  </div>
+</div>
+
+<nav class="topnav">
+  <a class="nav-link active" href="#flow">作業流程</a>
+  <a class="nav-link" href="#home">現場作業首頁</a>
+  <a class="nav-link" href="#qr">QR 掃碼</a>
+  <a class="nav-link" href="#form">點檢表單</a>
+  <a class="nav-link" href="#workorder">異常工單</a>
+  <a class="nav-link" href="#offline">離線功能</a>
+  <a class="nav-link" href="#discuss">待確認事項</a>
+</nav>
+
+<main>
+
+<section class="section" id="flow">
+  <div class="section-title"><div class="num">1</div>現場作業整體流程</div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>已確認可用</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--yellow);"></div>部分可用</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e2e8f0;"></div>待確認</div>
+  </div>
+  <div class="flow">
+    <div class="flow-step"><div class="flow-box done"><div class="icon">📱</div>開啟現場作業首頁</div><div class="flow-label">登入後直接進入</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box done"><div class="icon">📋</div>查看今日工作清單</div><div class="flow-label">可選日期、篩選狀態、搜尋</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box done"><div class="icon">📷</div>掃描設備 QR Code</div><div class="flow-label">或從清單點選</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box done"><div class="icon">✍️</div>填寫點檢表單</div><div class="flow-label">逐項檢點、拍照</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box partial"><div class="icon">⚠️</div>異常處理</div><div class="flow-label">強制拍照、自動轉工單</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box done"><div class="icon">✅</div>送出完成</div><div class="flow-label">線上立即同步<br>離線自動排隊</div></div>
+  </div>
+</section>
+
+<section class="section" id="home">
+  <div class="section-title"><div class="num">2</div>現場作業首頁</div>
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+    <div class="mockup-wrap" style="flex-shrink:0;">
+      <div class="mockup-bar">
+        <span class="mockup-bar-title">≡ &nbsp;現場作業首頁</span>
+        <span style="color:#93c5fd;font-size:11px;font-weight:600;">⊞ 掃QR</span>
+      </div>
+      <div class="mockup-body">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:8px 10px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;color:#15803d;font-weight:600;">✅ 2026-04 月度簽名 已完成</span>
+          <button style="font-size:10px;padding:3px 8px;background:#dcfce7;color:#15803d;border:none;border-radius:5px;">重新簽名</button>
+        </div>
+        <div style="font-weight:700;font-size:12px;margin-bottom:8px;">📋 今日工作 <span style="background:#dbeafe;color:#1d4ed8;border-radius:99px;padding:1px 7px;font-size:10px;">3</span></div>
+        <div class="mockup-date-row">
+          <button class="mockup-btn active">今天 04/24 (週五)</button>
+          <button class="mockup-btn idle">明天 04/25 (週六)</button>
+          <button class="mockup-btn idle">後天 04/26 (週日)</button>
+        </div>
+        <div class="mockup-filter-row">
+          <button class="mockup-btn idle" style="font-size:10px;">待執行 (2)</button>
+          <button class="mockup-btn active" style="font-size:10px;">進行中 (1)</button>
+          <button class="mockup-btn idle" style="font-size:10px;">全部</button>
+        </div>
+        <div class="mockup-filter-row">
+          <div class="mockup-search">🔍 搜尋工作項目...</div>
+          <div class="mockup-select">所有區域 ▾</div>
+        </div>
+        <div class="mockup-item">
+          <div class="mockup-item-title">A棟壓縮機日常點檢 <span class="mockup-badge mb-blue">點檢</span><span class="mockup-badge mb-orange">進行中</span></div>
+          <div class="mockup-item-meta">📍 A棟機房 · 🕐 08:00 · 3/8 項完成</div>
+        </div>
+        <div class="mockup-item">
+          <div class="mockup-item-title">B棟馬達周檢 <span class="mockup-badge mb-blue">點檢</span></div>
+          <div class="mockup-item-meta">📍 B棟生產線 · 🕐 10:00</div>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>功能項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr><td>月度簽名狀態卡<div class="note">頁面頂部</div></td><td>顯示本月是否已完成月度確認簽名，未簽名時顯示橘色警示，可直接點擊前往簽名</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>日期切換<div class="note">今天/明天/後天</div></td><td>預設顯示今天的工作；可切換至明天、後天提前查看</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>狀態篩選<div class="note">待執行/進行中/全部</div></td><td>工作項目依完成狀態分類，各類別顯示數量</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>關鍵字搜尋</td><td>依工作項目名稱、設備名稱即時過濾</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>區域篩選<div class="note">下拉選單</div></td><td>依功能區域過濾工作清單，選項來自系統設定的區域資料</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>工作項目卡片</td><td>顯示：項目名稱、類型標籤（點檢/工單）、狀態、所在區域、時間、進度（如 3/8 項）</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>待上傳標示<div class="note">離線時</div></td><td>離線完成的項目會標示「待上傳 ↑」，網路恢復後自動同步</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>離線狀態指示<div class="note">頂部導覽列</div></td><td>無網路時顯示橘色「離線模式」，並顯示待上傳筆數</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>工作項目整合顯示</td><td>點檢任務與維修工單整合在同一清單，用不同 icon 區分類型</td><td><span class="status-pill s-done">已確認</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="qr">
+  <div class="section-title"><div class="num">3</div>QR Code 掃碼入口</div>
+  <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;">
+    <div style="flex:1;min-width:280px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr><td>掃碼按鈕位置<div class="note">右上角</div></td><td>現場作業首頁右上角「⊞ 掃QR」按鈕，點擊開啟相機</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>掃碼後動作</td><td>識別到設備 QR Code 後，自動跳轉至該設備的點檢表單執行頁</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>QR Code 內容</td><td>每台設備有唯一 QR Code，貼在設備上，掃碼即知道是哪台設備</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>QR Code 產生<div class="note">管理端</div></td><td>管理員在設備管理頁可產生並下載設備 QR Code</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>掃碼後的設備對應</td><td>QR Code 對應到設備 ID，系統撈取該設備今日待執行任務</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+          <tr><td>找不到任務時的處理</td><td>掃碼後若該設備今日無點檢任務，目前行為需確認（顯示提示？還是空白？）</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="flex-shrink:0;max-width:300px;">
+      <div style="background:#1e293b;border-radius:14px;padding:12px;">
+        <div style="background:#0f172a;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <span style="color:#f1f5f9;font-size:13px;font-weight:600;">掃描 QR Code</span>
+          <span style="color:#94a3b8;font-size:18px;">✕</span>
+        </div>
+        <div style="background:#334155;border-radius:8px;padding:20px;text-align:center;">
+          <div style="width:140px;height:140px;background:#475569;border-radius:8px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:48px;">⬛</div>
+          <div style="color:#94a3b8;font-size:11px;">將 QR Code 對準框框內</div>
+          <div style="color:#64748b;font-size:10px;margin-top:4px;">使用 html5-qrcode 套件</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="form">
+  <div class="section-title"><div class="num">4</div>點檢表單執行頁</div>
+
+  <!-- 4-1 單設備多模板 -->
+  <div style="margin-bottom:12px;font-size:15px;font-weight:700;color:var(--text);">📋 4-1　單設備多模板 <span class="status-pill s-done">已確認</span></div>
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;margin-bottom:28px;">
+    <div style="flex-shrink:0;width:420px;max-width:100%;">
+      <!-- 模擬「巡檢歷史與報表」畫面 -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <!-- 頁首 -->
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;color:var(--text2);">≡</span>
+          <span style="font-size:18px;color:var(--text2);">‹</span>
+          <span style="font-weight:700;font-size:15px;color:var(--text);">巡檢歷史與報表</span>
+        </div>
+
+        <!-- 紀錄列表 -->
+        <div style="padding:12px;background:#f8fafc;">
+          <!-- 紀錄 1：鐵製輸送帶 -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;opacity:.55;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:700;font-size:12px;color:var(--text);">鐵製輸送帶</div>
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px;">📄 鐵製輸送帶日點檢(範例)</div>
+            <div style="font-size:11px;color:var(--text3);">👤 五股巡檢人員</div>
+            <div style="font-size:11px;color:var(--text3);">🕐 2026/04/08 上午10:16</div>
+            <div style="font-size:11px;color:var(--text3);">🖼 1 張照片</div>
+          </div>
+
+          <!-- 紀錄 2：輸送機-#12（模板A） -->
+          <div style="background:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 12px;margin-bottom:10px;box-shadow:0 0 0 3px rgba(59,130,246,.12);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:700;font-size:13px;color:var(--text);">輸送機-#12</div>
+              <span style="background:#dcfce7;color:#15803d;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;">正常</span>
+            </div>
+            <div style="font-size:11px;color:var(--text2);margin-top:4px;">📄 <b>輸送機 6項</b></div>
+            <div style="font-size:11px;color:var(--text3);">👤 系統管理員</div>
+            <div style="font-size:11px;color:var(--text3);">🕐 2026/04/08 上午11:11</div>
+          </div>
+
+          <!-- 紀錄 3：輸送機-#12（模板B） -->
+          <div style="background:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 12px;margin-bottom:10px;box-shadow:0 0 0 3px rgba(59,130,246,.12);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:700;font-size:13px;color:var(--text);">輸送機-#12</div>
+              <span style="background:#dcfce7;color:#15803d;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;">正常</span>
+            </div>
+            <div style="font-size:11px;color:var(--text2);margin-top:4px;">📄 <b>輸送機日點檢表</b></div>
+            <div style="font-size:11px;color:var(--text3);">👤 系統管理員</div>
+            <div style="font-size:11px;color:var(--text3);">🕐 2026/04/08 上午11:10</div>
+          </div>
+
+          <!-- 紀錄 4：鐵製輸送帶（灰掉） -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;opacity:.55;">
+            <div style="font-weight:700;font-size:12px;color:var(--text);">鐵製輸送帶</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px;">📄 鐵製輸送帶日點檢(範例)</div>
+          </div>
+        </div>
+      </div>
+      <div class="illus-img-caption" style="margin-top:8px;">▲ 巡檢歷史與報表頁：同一台「輸送機-#12」當天產出<b style="color:var(--blue);">兩筆</b>不同模板的點檢紀錄</div>
+    </div>
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>單設備可綁多張模板<div class="note">設備層設定</div></td>
+            <td>一台設備可綁定多個不同用途的點檢模板，每張模板針對不同檢查目的，項目各自獨立（例：輸送機-#12 同時有「輸送機 6 項」和「輸送機日點檢表」）</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>多模板用途<div class="note">各自針對不同面向</div></td>
+            <td>例如輸送機可有「6 項簡易日檢」針對重點檢查，「日點檢表」針對正式完整檢查；也可以是月點檢表、季點檢表等不同頻率的檢查</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>合併規則<div class="note">同日同頻率</div></td>
+            <td>同一天、<b>相同頻率</b>的多張模板 → 合併為<b>同一份任務</b>，表單內依模板名稱分組顯示（藍色標題區隔）</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>不合併的情況<div class="note">頻率不同</div></td>
+            <td>頻率不同（例：日點檢 vs 月點檢）→ 各自獨立為<b>不同任務</b>，不會合併</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>歷史紀錄顯示</td>
+            <td>在「巡檢歷史與報表」頁，每張模板的執行結果各自顯示為一筆紀錄（如圖中兩筆 輸送機-#12）</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4-2 逐項勾選 -->
+  <div style="margin-bottom:12px;font-size:15px;font-weight:700;color:var(--text);">📝 4-2　逐項勾選 <span class="status-pill s-done">已確認</span></div>
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;margin-bottom:28px;">
+    <div style="flex-shrink:0;width:460px;max-width:100%;">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-weight:700;font-size:15px;color:var(--text);">巡檢詳情</span>
+          <span style="color:var(--text3);font-size:16px;cursor:pointer;">✕</span>
+        </div>
+
+        <div style="padding:12px 16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:13px;">基本資訊</div>
+            <span style="background:#dcfce7;color:#15803d;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;">正常</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:11px;">
+            <div><div style="color:var(--text3);">設備名稱</div><div style="font-weight:600;">輸送機-#12</div></div>
+            <div><div style="color:var(--text3);">設備編號</div><div style="font-weight:600;">-</div></div>
+            <div><div style="color:var(--text3);">巡檢模板</div><div style="font-weight:600;">輸送機 6項</div></div>
+            <div><div style="color:var(--text3);">巡檢週期</div><div style="font-weight:600;">日檢</div></div>
+            <div><div style="color:var(--text3);">執行人員</div><div style="font-weight:600;">系統管理員</div></div>
+            <div><div style="color:var(--text3);">排程日期</div><div style="font-weight:600;">2026-04-08</div></div>
+          </div>
+        </div>
+
+        <div style="padding:12px 16px;border-top:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-weight:700;font-size:13px;">檢查結果</div>
+            <div style="font-size:11px;"><span style="color:var(--text2);">6 / 6 通過</span> <span style="color:var(--green);font-weight:700;">(100%)</span></div>
+          </div>
+          <div style="background:#e2e8f0;height:5px;border-radius:99px;overflow:hidden;margin-bottom:10px;">
+            <div style="background:var(--green);height:100%;width:100%;"></div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--green);font-weight:700;">✓</span>輸送機(關機)-輸送帶兩側異物殘留</div>
+            <span style="color:var(--green);font-weight:700;font-size:11px;">通過</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--green);font-weight:700;">✓</span>輸送機(關機)-頭輪內異物殘留</div>
+            <span style="color:var(--green);font-weight:700;font-size:11px;">通過</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--green);font-weight:700;">✓</span>輸送機(關機)-皮帶磨耗檢查</div>
+            <span style="color:var(--green);font-weight:700;font-size:11px;">通過</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--green);font-weight:700;">✓</span>輸送機(關機)-軸承潤滑狀況</div>
+            <span style="color:var(--green);font-weight:700;font-size:11px;">通過</span>
+          </div>
+        </div>
+      </div>
+      <div class="illus-img-caption" style="margin-top:8px;">▲ 巡檢詳情頁：每項檢點逐一顯示結果，搭配整體通過率與進度條</div>
+    </div>
+
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>逐項勾選<div class="note">每項單獨標記</div></td>
+            <td>每個檢點項目可單獨標記「通過」或「異常」，勾選後整體通過率自動更新</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>整體通過率<div class="note">即時計算</div></td>
+            <td>頂部顯示「X / Y 通過 (百分比)」與進度條，一眼看出本次任務完成狀況</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>基本資訊自動帶入</td>
+            <td>設備名稱、編號、模板、週期、執行人、排程日期由系統自動填入，人員不需重複輸入</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4-3 備註與異常處理 -->
+  <div style="margin-bottom:12px;font-size:15px;font-weight:700;color:var(--text);">🚨 4-3　備註與異常處理 <span class="status-pill s-done">已確認</span></div>
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;margin-bottom:28px;">
+    <div style="flex-shrink:0;width:460px;max-width:100%;">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-weight:700;font-size:15px;color:var(--text);">巡檢詳情</span>
+          <span style="color:var(--text3);font-size:16px;cursor:pointer;">✕</span>
+        </div>
+        <div style="padding:12px 16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-weight:700;font-size:13px;">檢查結果</div>
+            <div style="font-size:11px;"><span style="color:var(--text2);">3 / 4 通過</span> <span style="color:var(--red);font-weight:700;">(75%)</span></div>
+          </div>
+          <div style="background:#e2e8f0;height:5px;border-radius:99px;overflow:hidden;margin-bottom:10px;">
+            <div style="background:var(--red);height:100%;width:75%;"></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--green);font-weight:700;">✓</span>檢查馬達運轉聲音</div>
+            <span style="color:var(--green);font-weight:700;font-size:11px;">通過</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--green);font-weight:700;">✓</span>檢查緊急停止按鈕</div>
+            <span style="color:var(--green);font-weight:700;font-size:11px;">通過</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--green);font-weight:700;">✓</span>檢查設備外觀</div>
+            <span style="color:var(--green);font-weight:700;font-size:11px;">通過</span>
+          </div>
+          <div style="padding:10px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;"><span style="color:var(--red);font-weight:700;">✗</span>軸承是否破損</div>
+              <span style="color:var(--red);font-weight:700;font-size:11px;">異常</span>
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-left:18px;margin-bottom:6px;">📝 備註：軸承破損</div>
+            <div style="margin-left:18px;width:80px;height:80px;background:#94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;">📷 照片</div>
+          </div>
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-weight:700;font-size:13px;">關聯工單</div>
+          <a href="#" style="color:var(--yellow);font-size:11px;font-weight:600;text-decoration:none;">前往工單 ↗</a>
+        </div>
+      </div>
+      <div class="illus-img-caption" style="margin-top:8px;">▲ 異常項目自動顯示備註文字與拍照縮圖，底部連結至自動建立的工單</div>
+    </div>
+
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>異常 UI 樣式</td>
+            <td>整張卡片變紅底、紅框；「✗」紅色 X 標示；右側顯示「異常」紅字，與通過項目視覺上立即區分</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>備註欄位<div class="note">文字描述</div></td>
+            <td>勾選異常時出現備註欄，填寫原因描述（例：「軸承破損」），顯示在該項目卡片內</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>強制拍照<div class="note">異常必填</div></td>
+            <td>異常項目必須附上照片，縮圖顯示在備註下方；未拍照無法送出（photoUrl 必填驗證）</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>進度條變色</td>
+            <td>有異常項目時，頂部進度條從綠色變紅色，通過率數字也轉紅，提醒有問題</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>關聯工單連結<div class="note">底部</div></td>
+            <td>巡檢有異常時，底部出現「關聯工單」區塊，點「前往工單」可查看自動建立的維修工單</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>正常項目拍照</td>
+            <td>正常項目是否也能主動拍照留存？目前截圖中未見，需向開發者確認</td>
+            <td><span class="status-pill s-discuss">待確認</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===== 新增 §5：異常工單管理 ===== -->
+<section class="section" id="workorder">
+  <div class="section-title"><div class="num">5</div>異常工單管理</div>
+
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px;">
+    <div style="flex-shrink:0;width:460px;max-width:100%;">
+      <!-- 模擬「工單管理」頁面 -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;color:var(--text2);">≡</span>
+          <span style="font-size:16px;color:var(--text2);">‹</span>
+          <span style="font-weight:700;font-size:15px;color:var(--text);">工單管理</span>
+        </div>
+
+        <!-- 狀態 tab -->
+        <div style="padding:10px 14px;display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;border-bottom:1px solid var(--border);">
+          <span style="background:#1e293b;color:#fff;font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;">全部</span>
+          <span style="background:#e2e8f0;color:var(--text2);font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;">待指派</span>
+          <span style="background:#e2e8f0;color:var(--text2);font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;">處理中</span>
+          <span style="background:#e2e8f0;color:var(--text2);font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;">待確認</span>
+          <span style="background:#e2e8f0;color:var(--text2);font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;">已結案</span>
+        </div>
+
+        <!-- 工單卡 1 -->
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#e0e7ff;color:#4338ca;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;">低優先</span>
+              <span style="font-weight:700;font-size:13px;">輸送機-#12</span>
+            </div>
+            <span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;">處理中</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">馬達+減速機(關機)-有否變形、破損或裂痕</div>
+          <div style="font-size:10px;color:var(--text3);">📅 2026-04-08 · 👤 五股巡檢人員 · 🎯 預計 2026-04-10</div>
+        </div>
+
+        <!-- 工單卡 2 -->
+        <div style="padding:12px 14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#e0e7ff;color:#4338ca;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;">低優先</span>
+              <span style="font-weight:700;font-size:13px;">鐵製輸送帶</span>
+            </div>
+            <span style="background:#dcfce7;color:#15803d;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;">已結案</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">軸承是否破損（備註：軸承破損）</div>
+          <div style="font-size:10px;color:var(--text3);">📅 2026-04-08 · 👤 系統管理員 · 🎯 預計 2026-04-10</div>
+        </div>
+      </div>
+      <div class="illus-img-caption" style="margin-top:8px;">▲ 工單管理頁：點檢異常自動建立工單，含優先度、指派人員、預計完成日與狀態流轉</div>
+    </div>
+
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>異常自動建工單</td>
+            <td>巡檢任務送出後，系統背景自動偵測異常檢點（fail 項目）並建立維修工單，不阻塞送出流程</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>狀態流轉<div class="note">5 種狀態</div></td>
+            <td>待指派 → 處理中 → 待確認 → 已結案（也可全部檢視），可用頁籤篩選</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>工單資訊</td>
+            <td>包含優先度、設備名稱、異常描述（含備註）、建單日期、指派人員、預計完成日</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>AI 建議處理方案</td>
+            <td>開啟工單詳情後，系統提供多組 AI 自動生成的處理步驟（例：更換軸承 / 軸承修復），條列步驟供維修人員參考</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>指派給維修人員<div class="note">管理員操作</div></td>
+            <td>管理員可將待指派工單分派給特定維修人員，人員可在自己的工單清單看到</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>完成回報與結案</td>
+            <td>維修人員回報完成 → 管理員確認 → 結案，整個流程可追溯</td>
+            <td><span class="status-pill s-discuss">待確認</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AI 建議處理方案 圖文說明 -->
+  <div style="margin-top:20px;display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex-shrink:0;width:460px;max-width:100%;">
+      <!-- 模擬「建議處理方案」彈窗 -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-weight:700;font-size:15px;color:var(--text);">建議處理方案</span>
+          <span style="color:var(--text3);font-size:16px;cursor:pointer;">✕</span>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);">
+            馬達+減速機(關機)-有否變形、破損或裂痕：觀察有否變形、破損或裂痕（備註：軸承破損）
+          </div>
+
+          <!-- AI 建議 1 -->
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+            <div style="margin-bottom:6px;">
+              <span style="background:#f5f3ff;color:#7c3aed;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;">[AI 建議]</span>
+              <span style="font-weight:700;font-size:13px;margin-left:6px;">更換軸承</span>
+            </div>
+            <ol style="padding-left:22px;font-size:11px;color:var(--text2);line-height:1.8;margin:0;">
+              <li>停機並斷開電源。</li>
+              <li>拆卸馬達與減速機，檢查損壞部件。</li>
+              <li>移除破損的軸承並清理相關部位。</li>
+              <li>安裝新軸承並確認固定牢靠。</li>
+              <li>重新組裝設備並進行測試運行。</li>
+            </ol>
+          </div>
+
+          <!-- AI 建議 2 -->
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
+            <div style="margin-bottom:6px;">
+              <span style="background:#f5f3ff;color:#7c3aed;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;">[AI 建議]</span>
+              <span style="font-weight:700;font-size:13px;margin-left:6px;">軸承修復</span>
+            </div>
+            <ol style="padding-left:22px;font-size:11px;color:var(--text2);line-height:1.8;margin:0;">
+              <li>停機並斷開電源。</li>
+              <li>拆卸馬達與減速機，檢查軸承損壞程度。</li>
+              <li>使用專業工具修復軸承表面或更換內部零件。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="illus-img-caption" style="margin-top:8px;">▲ AI 建議處理方案彈窗：根據異常描述產出多組處理步驟</div>
+    </div>
+
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>觸發方式</td>
+            <td>工單詳情頁點擊「建議處理方案」按鈕開啟彈窗</td>
+            <td><span class="status-pill s-discuss">待確認</span></td>
+          </tr>
+          <tr>
+            <td>資料來源<div class="note">RAG + AI</div></td>
+            <td>先查 RAG 知識庫；若無匹配才呼叫 AI API 生成（節省 token 成本）</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>建議內容</td>
+            <td>針對異常描述產出多組方案（例：更換 / 修復），每組含條列式步驟</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>AI 服務商</td>
+            <td>目前支援 OpenAI / Gemini / Anthropic，可於管理端設定 API Key</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>建議的準確度</td>
+            <td>取決於 RAG 知識庫內容與 AI 模型；初期建議人工審核後再執行</td>
+            <td><span class="status-pill s-discuss">待確認</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="offline">
+  <div class="section-title"><div class="num">6</div>離線功能（無網路時仍可作業）</div>
+  <table class="anno-table">
+    <thead><tr><th>功能</th><th>實作說明</th><th style="width:80px;">狀態</th></tr></thead>
+    <tbody>
+      <tr><td>離線填報</td><td>無網路時仍可開啟點檢表單、填寫結果、拍照，資料暫存在 IndexedDB（瀏覽器本地儲存）</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>待上傳佇列</td><td>離線完成的資料放入同步佇列，網路恢復後自動依序上傳，失敗最多重試 5 次</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>手動重試</td><td>自動重試失敗後，可手動觸發重新上傳</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>今日任務快取</td><td>PWA Service Worker 快取今日任務 8 小時（StaleWhileRevalidate），即使無網路也能看到任務清單</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>IndexedDB 儲存<div class="note">4 個 store</div></td><td>tasks（任務）/ checkpoints（檢點）/ sync_queue（待同步佇列）/ photos（照片）</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>離線時的照片</td><td>照片暫存在本地，網路恢復後一併上傳</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>離線時間上限</td><td>IndexedDB 可離線存放多久？長時間離線會不會遺失資料？</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="section" id="discuss">
+  <div class="section-title"><div class="num">7</div>未完成規劃與待確認事項</div>
+
+  <!-- 尚未實作的規劃功能 -->
+  <div style="margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">🔨 尚未實作的規劃功能</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-card-title">🔢 數值量測比對 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">計畫在檢點項目加入「標準值 / 上限 / 下限」欄位，輸入測量值後自動判斷是否超標。目前點檢僅有「通過 / 異常」二元選項，無數值量測。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">🎙️ 語音備註 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">計畫整合 Whisper API，讓現場人員可用語音輸入備註（戴手套、手濕不方便打字的情境）。目前只能用文字輸入備註。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">🔄 點檢進度保存 <span class="status-pill s-discuss">待確認</span></div>
+        <div class="feat-card-desc">中途關掉頁面再回來，已填的內容是否保留？離線狀態下的進度存放在 IndexedDB，但網路情況下的暫存行為需請開發者確認。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="discuss-box">
+    <div class="discuss-box-title">⚠️ 以下項目為預想功能，需與庭程確認實際行為</div>
+    <ul>
+      <li>掃描 QR Code 後，若該設備當天沒有點檢任務，畫面會顯示什麼？是否可臨時新建？</li>
+      <li>點檢進行到一半關掉頁面，下次開啟是否還在同一個進度（有沒有自動儲存草稿）？</li>
+      <li>日期選擇器目前是「今天/明天/後天」，能不能往前看歷史日期？</li>
+      <li>區域篩選的「所有區域」選項，資料來源是哪個層級？是功能區域（FunctionalArea）還是場域（Site）？</li>
+      <li>工作清單中的「維修工單」跟「點檢任務」同時出現，兩個的流程是否完全一樣？工單完成後也是同樣的送出方式？</li>
+      <li>月度簽名的用途是什麼？簽名完成後會觸發什麼流程（通知主管？寫入報表？）</li>
+      <li>離線模式下，IndexedDB 資料會保留多久？裝置重啟或清快取後會不會消失？</li>
+    </ul>
+  </div>
+  <div style="margin-top:24px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 18px;">
+    <div style="font-weight:700;font-size:13px;color:#1d4ed8;margin-bottom:8px;">📌 功能狀態說明</div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill s-done">已確認</span><span style="font-size:12px;color:var(--text2)">程式碼中已實作</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill s-partial">部分可用</span><span style="font-size:12px;color:var(--text2)">基礎存在但有缺口</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill s-todo">尚未實作</span><span style="font-size:12px;color:var(--text2)">規劃中，程式碼未實作</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill s-discuss">待確認</span><span style="font-size:12px;color:var(--text2)">需與開發者討論</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const id = link.getAttribute('href').replace('#','');
+    document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+    document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      const id = entry.target.id;
+      document.querySelectorAll('.nav-link').forEach(l => {
+        l.classList.toggle('active', l.getAttribute('href') === '#'+id);
+      });
+    }
+  });
+}, {threshold:0.2});
+document.querySelectorAll('.section').forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

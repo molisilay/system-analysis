@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系統管理與權限說明 — 智慧點檢平台</title>
+<style>
+:root{
+  --bg:#f8fafc;--bg2:#fff;--border:#e2e8f0;
+  --text:#1e293b;--text2:#475569;--text3:#94a3b8;
+  --blue:#3b82f6;--blue-light:#eff6ff;--blue-dim:#dbeafe;
+  --green:#16a34a;--green-light:#f0fdf4;--green-dim:#dcfce7;
+  --yellow:#d97706;--yellow-light:#fffbeb;--yellow-dim:#fef3c7;
+  --red:#dc2626;--red-light:#fef2f2;--red-dim:#fee2e2;
+  --purple:#7c3aed;--purple-dim:#f5f3ff;
+  --gray-light:#f1f5f9;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Microsoft JhengHei',system-ui,sans-serif;font-size:14px;line-height:1.6;}
+
+/* 主導覽列（跨分頁切換） */
+.main-nav{
+  background:#0f172a;color:#fff;padding:0 48px;height:48px;
+  display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:60;
+  border-bottom:1px solid #1e293b;
+}
+.main-nav-brand{font-size:13px;font-weight:700;color:#cbd5e1;margin-right:32px;display:flex;align-items:center;gap:8px;}
+.main-nav-brand::before{content:"";display:inline-block;width:6px;height:14px;background:var(--blue);border-radius:2px;}
+.main-nav a{
+  color:#94a3b8;font-size:13px;font-weight:500;text-decoration:none;
+  padding:0 18px;height:48px;display:flex;align-items:center;
+  border-bottom:2px solid transparent;transition:all .15s;
+}
+.main-nav a:hover{color:#fff;}
+.main-nav a.active{color:#fff;background:rgba(59,130,246,.15);border-bottom-color:var(--blue);}
+.main-nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:11px;color:#64748b;}
+
+.page-hdr{background:#1e2d4a;color:#fff;padding:28px 48px 24px;}
+.page-hdr h1{font-size:20px;font-weight:700;}
+.page-hdr p{color:#94a3b8;font-size:13px;margin-top:4px;}
+.tag-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.tag{padding:3px 12px;border-radius:99px;font-size:11px;font-weight:600;}
+.tag-blue{background:rgba(59,130,246,.2);color:#93c5fd;border:1px solid rgba(59,130,246,.4);}
+.tag-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);}
+.tag-yellow{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);}
+
+.topnav{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:0 48px;display:flex;align-items:center;gap:24px;
+  position:sticky;top:48px;z-index:50;overflow-x:auto;
+}
+.nav-link{
+  padding:14px 0;font-size:13px;font-weight:500;color:var(--text2);
+  border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;
+  text-decoration:none;white-space:nowrap;
+}
+.nav-link:hover{color:var(--blue);}
+.nav-link.active{color:var(--blue);border-bottom-color:var(--blue);}
+
+main{max-width:1060px;margin:0 auto;padding:36px 48px 80px;}
+.section{margin-bottom:52px;}
+.section-title{
+  font-size:17px;font-weight:700;color:var(--text);
+  padding-bottom:12px;border-bottom:2px solid var(--border);
+  margin-bottom:24px;display:flex;align-items:center;gap:8px;
+}
+.section-title .num{
+  width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;
+}
+
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.feat-card-title{font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.feat-card-desc{font-size:13px;color:var(--text2);line-height:1.7;}
+.status-pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;}
+.s-done{background:var(--green-dim);color:var(--green);}
+.s-partial{background:var(--yellow-dim);color:var(--yellow);}
+.s-todo{background:var(--red-dim);color:var(--red);}
+.s-discuss{background:#e0e7ff;color:#4338ca;}
+
+/* 權限階層樹狀圖 */
+.tree{display:flex;flex-direction:column;align-items:center;gap:0;padding:20px 0;}
+.tree-node{
+  padding:10px 20px;border-radius:10px;font-weight:700;font-size:13px;
+  min-width:180px;text-align:center;border:2px solid;
+}
+.tn-super{background:#fef2f2;border-color:var(--red);color:#991b1b;}
+.tn-company{background:#fffbeb;border-color:var(--yellow);color:#92400e;}
+.tn-admin{background:#eff6ff;border-color:var(--blue);color:#1d4ed8;}
+.tn-frontline{background:#f0fdf4;border-color:var(--green);color:#166534;}
+.tn-todo{background:#f1f5f9;border-color:#cbd5e1;color:var(--text3);border-style:dashed;}
+.tree-line{width:2px;height:24px;background:var(--border);}
+.tree-row{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;justify-content:center;}
+.tree-col{display:flex;flex-direction:column;align-items:center;}
+
+.anno-table{width:100%;border-collapse:collapse;}
+.anno-table th{text-align:left;padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);background:var(--gray-light);border-bottom:1px solid var(--border);}
+.anno-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:top;}
+.anno-table tr:last-child td{border-bottom:none;}
+.anno-table td:first-child{font-weight:600;color:var(--text);white-space:nowrap;}
+.anno-table td .note{font-size:11px;color:var(--text3);margin-top:3px;font-weight:400;}
+
+.illus-img-caption{font-size:11px;color:var(--text3);margin-top:6px;text-align:center;}
+
+.discuss-box{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:16px 18px;margin-top:16px;}
+.discuss-box-title{font-weight:700;font-size:13px;color:#92400e;margin-bottom:8px;}
+.discuss-box ul{padding-left:18px;}
+.discuss-box li{font-size:13px;color:#78350f;line-height:1.8;}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+.legend-dot{width:12px;height:12px;border-radius:3px;}
+
+@media(max-width:720px){
+  main{padding:24px 20px 60px;}
+  .page-hdr{padding:20px;}
+  .topnav{padding:0 20px;}
+  .feat-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav class="main-nav">
+  <div class="main-nav-brand">智慧點檢平台</div>
+  <a href="index.html">🗺️ 系統藍圖</a>
+  <a href="系統盤點分析報告.html">📊 系統盤點總覽</a>
+  <a href="現場作業介面說明.html">👷 現場作業介面</a>
+  <a href="系統管理與權限說明.html" class="active">🔐 系統管理與權限</a>
+  <div class="main-nav-right">2026-04-24</div>
+</nav>
+
+<div class="page-hdr">
+  <h1>系統管理與權限 — 功能說明文件</h1>
+  <p>智慧點檢平台 · 管理員視角 · 2026-04-24</p>
+  <div class="tag-row">
+    <span class="tag tag-blue">對象：系統管理員 / 場域管理員</span>
+    <span class="tag tag-green">目前完成度：約 70%</span>
+    <span class="tag tag-yellow">主要缺口：ABAC 屬性權限、簽核引擎</span>
+  </div>
+</div>
+
+<nav class="topnav">
+  <a class="nav-link active" href="#overview">權限架構</a>
+  <a class="nav-link" href="#user">使用者管理</a>
+  <a class="nav-link" href="#role">角色管理</a>
+  <a class="nav-link" href="#org">組織結構</a>
+  <a class="nav-link" href="#view">視角與隔離</a>
+  <a class="nav-link" href="#audit">刪除與稽核</a>
+  <a class="nav-link" href="#discuss">未完成與待確認</a>
+</nav>
+
+<main>
+
+<!-- 1. 權限架構全覽 -->
+<section class="section" id="overview">
+  <div class="section-title"><div class="num">1</div>權限架構全覽</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>已實作可用</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--yellow);"></div>部分可用</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#cbd5e1;"></div>尚未實作 / 規劃中</div>
+  </div>
+
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex:1;min-width:420px;">
+      <!-- 角色階層樹 -->
+      <div class="tree">
+        <div class="tree-node tn-super">👑 Super Admin（超級管理員）</div>
+        <div class="tree-line"></div>
+        <div class="tree-node tn-company">🏢 Company Admin（公司管理員）</div>
+        <div class="tree-line"></div>
+        <div class="tree-node tn-admin">🛠️ Site Admin（場域管理員）</div>
+        <div class="tree-line"></div>
+        <div class="tree-node tn-frontline">👷 Frontline（現場作業人員）</div>
+        <div class="tree-line"></div>
+        <div class="tree-row" style="margin-top:4px;">
+          <div class="tree-node tn-todo" style="min-width:110px;font-size:11px;">📦 倉管<br>（規劃中）</div>
+          <div class="tree-node tn-todo" style="min-width:110px;font-size:11px;">🛒 採購<br>（規劃中）</div>
+          <div class="tree-node tn-todo" style="min-width:110px;font-size:11px;">🔧 維修工程師<br>（規劃中）</div>
+        </div>
+      </div>
+      <div class="illus-img-caption">▲ 目前 4 層角色架構（實心），未來規劃 3 個新角色（虛線）</div>
+    </div>
+
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>權限層級</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Super Admin<div class="note">超級管理員</div></td>
+            <td>全系統最高權限，可跨公司/場域檢視與操作，通常只給系統維護人員</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>Company Admin<div class="note">公司管理員</div></td>
+            <td>管理該公司底下所有場域，可新增場域、指派管理員</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>Site Admin<div class="note">場域管理員</div></td>
+            <td>管理該場域的設備、人員、任務、工單、報表；看不到其他場域的資料</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>Frontline<div class="note">現場作業人員</div></td>
+            <td>執行點檢任務、完成工單、上傳照片；只能看到指派給自己的項目</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>倉管 / 採購 / 維修工程師</td>
+            <td>未來需要（對應 M5 備品、M6 採購、M3 維修精細權限），目前角色都由 Admin 兼任</td>
+            <td><span class="status-pill s-todo">尚未實作</span></td>
+          </tr>
+          <tr>
+            <td>RBAC 自訂角色</td>
+            <td>Super Admin 可在「角色權限管理」頁新增自訂角色，勾選要開放的功能模組</td>
+            <td><span class="status-pill s-done">已確認</span></td>
+          </tr>
+          <tr>
+            <td>ABAC 屬性權限</td>
+            <td>依使用者屬性（指派的倉庫、場域）過濾可見資料。目前沒有，是 M5/M6 上線前必須補的</td>
+            <td><span class="status-pill s-todo">尚未實作</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 2. 使用者管理 -->
+<section class="section" id="user">
+  <div class="section-title"><div class="num">2</div>使用者管理</div>
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex-shrink:0;width:440px;max-width:100%;">
+      <!-- 模擬「使用者管理」頁 -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:16px;color:var(--text2);">‹</span>
+            <span style="font-weight:700;font-size:15px;">使用者管理</span>
+          </div>
+          <span style="background:var(--blue);color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;">+ 新增使用者</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="background:#f8fafc;">
+              <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:700;">帳號</th>
+              <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:700;">姓名</th>
+              <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:700;">角色</th>
+              <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:700;">場域</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-top:1px solid var(--border);">
+              <td style="padding:10px 12px;font-weight:600;">admin</td>
+              <td style="padding:10px 12px;">系統管理員</td>
+              <td style="padding:10px 12px;"><span style="background:#fef2f2;color:#991b1b;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;">Super Admin</span></td>
+              <td style="padding:10px 12px;color:var(--text3);">全部</td>
+            </tr>
+            <tr style="border-top:1px solid var(--border);">
+              <td style="padding:10px 12px;font-weight:600;">wg_admin</td>
+              <td style="padding:10px 12px;">五股管理員</td>
+              <td style="padding:10px 12px;"><span style="background:#eff6ff;color:#1d4ed8;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;">Site Admin</span></td>
+              <td style="padding:10px 12px;">五股廠</td>
+            </tr>
+            <tr style="border-top:1px solid var(--border);">
+              <td style="padding:10px 12px;font-weight:600;">wg_inspect01</td>
+              <td style="padding:10px 12px;">五股巡檢人員</td>
+              <td style="padding:10px 12px;"><span style="background:#f0fdf4;color:#166534;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;">Frontline</span></td>
+              <td style="padding:10px 12px;">五股廠</td>
+            </tr>
+            <tr style="border-top:1px solid var(--border);">
+              <td style="padding:10px 12px;font-weight:600;">tn_admin</td>
+              <td style="padding:10px 12px;">台南管理員</td>
+              <td style="padding:10px 12px;"><span style="background:#eff6ff;color:#1d4ed8;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;">Site Admin</span></td>
+              <td style="padding:10px 12px;">台南廠</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="illus-img-caption" style="margin-top:8px;">▲ 使用者管理頁：顯示帳號、姓名、角色、所屬場域</div>
+    </div>
+
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr><td>新增使用者</td><td>管理員可建立新帳號，設定密碼、姓名、Email、角色、所屬場域</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>編輯使用者</td><td>修改姓名、Email、角色、場域、啟用狀態</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>停用 / 刪除</td><td>停用後帳號無法登入；刪除會經過 Hard Delete 保護（寫入稽核日誌）</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>JWT 登入<div class="note">含 refresh</div></td><td>登入取得 JWT Token，過期自動刷新，不需重新輸入密碼</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>密碼加密</td><td>密碼以 bcrypt hash 儲存，不可逆向回推原文</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>密碼格式規則</td><td>是否有強制密碼長度、大小寫、特殊字元？需確認現行規則</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+          <tr><td>忘記密碼<div class="note">含驗證</div></td><td>需有 Email 驗證或手機 OTP 等機制，讓使用者自助重設密碼</td><td><span class="status-pill s-todo">尚未實作</span></td></tr>
+          <tr><td>首次登入改密</td><td>管理員建立的帳號，使用者首次登入是否強制改密碼？需確認</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+          <tr><td>使用者屬性<div class="note">ABAC 基礎</div></td><td>指派使用者可管理的倉庫、產線等細節屬性，M5/M6 上線前需補</td><td><span class="status-pill s-todo">尚未實作</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 3. 角色管理 -->
+<section class="section" id="role">
+  <div class="section-title"><div class="num">3</div>角色管理（RBAC）</div>
+
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex-shrink:0;width:460px;max-width:100%;">
+      <!-- 模擬「角色權限管理」頁 -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:16px;color:var(--text2);">‹</span>
+            <span style="font-weight:700;font-size:15px;">角色權限管理</span>
+          </div>
+          <span style="background:#4f46e5;color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;">+ 新增角色</span>
+        </div>
+
+        <!-- 角色卡片 -->
+        <div style="padding:12px;background:#f8fafc;">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-weight:700;font-size:13px;">現場作業員</span>
+                <span style="background:#dbeafe;color:#1d4ed8;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;">系統</span>
+              </div>
+              <span style="color:var(--text3);font-size:11px;">3 位使用者</span>
+            </div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <span style="background:#dcfce7;color:#15803d;font-size:9px;padding:2px 6px;border-radius:4px;">✓ 點檢任務</span>
+              <span style="background:#dcfce7;color:#15803d;font-size:9px;padding:2px 6px;border-radius:4px;">✓ 工單回報</span>
+              <span style="background:#dcfce7;color:#15803d;font-size:9px;padding:2px 6px;border-radius:4px;">✓ 掃 QR</span>
+              <span style="background:#f1f5f9;color:var(--text3);font-size:9px;padding:2px 6px;border-radius:4px;">✗ 設備管理</span>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-weight:700;font-size:13px;">場域管理員</span>
+                <span style="background:#dbeafe;color:#1d4ed8;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;">系統</span>
+              </div>
+              <span style="color:var(--text3);font-size:11px;">2 位使用者</span>
+            </div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <span style="background:#dcfce7;color:#15803d;font-size:9px;padding:2px 6px;border-radius:4px;">✓ 設備管理</span>
+              <span style="background:#dcfce7;color:#15803d;font-size:9px;padding:2px 6px;border-radius:4px;">✓ 人員管理</span>
+              <span style="background:#dcfce7;color:#15803d;font-size:9px;padding:2px 6px;border-radius:4px;">✓ 報表匯出</span>
+              <span style="background:#dcfce7;color:#15803d;font-size:9px;padding:2px 6px;border-radius:4px;">✓ 工單指派</span>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;border-style:dashed;opacity:.7;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text2);">自訂：品保主任</span>
+              <span style="color:var(--text3);font-size:11px;">0 位</span>
+            </div>
+            <div style="font-size:10px;color:var(--text3);">可自訂任意角色名稱與權限組合</div>
+          </div>
+        </div>
+      </div>
+      <div class="illus-img-caption" style="margin-top:8px;">▲ 角色權限管理頁：系統角色（藍色標籤）+ 自訂角色</div>
+    </div>
+
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr><td>系統預設角色</td><td>Super Admin / Company Admin / Site Admin / Frontline 四種，有「系統」標籤不可刪除</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>自訂角色</td><td>Super Admin 可新增任意角色名稱，勾選要開放的功能模組（RBAC）</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>權限顆粒度<div class="note">模組層級</div></td><td>目前以功能模組為單位勾選（例：設備管理 / 工單 / 報表）</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>細部動作權限<div class="note">CRUD 分離</div></td><td>讀 / 新增 / 編輯 / 刪除是否能分開授權？需確認目前是否細分</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+          <tr><td>使用者多角色</td><td>一人能否同時具備多個角色（例：倉管 + 現場作業）？需確認</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+          <tr><td>角色使用統計</td><td>每個角色顯示有幾位使用者，方便確認是否有人在用</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>刪除角色保護</td><td>有使用者的角色不能直接刪除，需先移除使用者或轉給其他角色</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 4. 組織結構 -->
+<section class="section" id="org">
+  <div class="section-title"><div class="num">4</div>組織結構（公司 → 場域 → 功能區域）</div>
+
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex-shrink:0;width:440px;max-width:100%;">
+      <!-- 組織樹狀 -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fef3c7;border-radius:6px;margin-bottom:6px;">
+          <span>🏢</span><span style="font-weight:700;font-size:13px;">OO 環保科技股份有限公司</span>
+          <span style="margin-left:auto;font-size:10px;color:var(--text3);">Company</span>
+        </div>
+        <div style="margin-left:24px;">
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#dbeafe;border-radius:6px;margin-bottom:6px;">
+            <span>📍</span><span style="font-weight:600;font-size:12px;">五股廠</span>
+            <span style="margin-left:auto;font-size:10px;color:var(--text3);">Site</span>
+          </div>
+          <div style="margin-left:24px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f0fdf4;border-radius:6px;margin-bottom:4px;font-size:11px;">
+              <span>📦</span><span>A 棟機房</span><span style="margin-left:auto;font-size:9px;color:var(--text3);">FunctionalArea</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f0fdf4;border-radius:6px;margin-bottom:4px;font-size:11px;">
+              <span>📦</span><span>B 棟生產線</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f0fdf4;border-radius:6px;font-size:11px;">
+              <span>📦</span><span>倉儲區</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#dbeafe;border-radius:6px;margin-top:8px;margin-bottom:6px;">
+            <span>📍</span><span style="font-weight:600;font-size:12px;">台南廠</span>
+            <span style="margin-left:auto;font-size:10px;color:var(--text3);">Site</span>
+          </div>
+          <div style="margin-left:24px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f0fdf4;border-radius:6px;font-size:11px;">
+              <span>📦</span><span>生產一線</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="illus-img-caption" style="margin-top:8px;">▲ 4 層組織結構：公司 → 場域 → 功能區域 → 設備</div>
+    </div>
+
+    <div style="flex:1;min-width:300px;">
+      <table class="anno-table">
+        <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+        <tbody>
+          <tr><td>公司 Company<div class="note">最上層</div></td><td>管理多家公司（多租戶架構），每家公司資料互不可見</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>場域 Site<div class="note">廠區層</div></td><td>例如五股廠、台南廠、高雄廠；每個使用者可指派所屬場域</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>功能區域 FunctionalArea</td><td>場域底下的區域劃分（機房、生產線、倉儲），用於現場區域篩選</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>設備 Machine</td><td>最底層，綁在功能區域下，含 QR Code、點檢模板</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>新增 / 編輯 / 停用</td><td>各層都有獨立的管理頁（公司、場域、功能區域清單）</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>層級綁定檢查</td><td>刪除公司前會檢查底下是否還有場域，刪除場域前會檢查設備</td><td><span class="status-pill s-done">已確認</span></td></tr>
+          <tr><td>批量匯入</td><td>設備支援 Excel 批量匯入；公司/場域是否支援？需確認</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 視角切換與資料隔離 -->
+<section class="section" id="view">
+  <div class="section-title"><div class="num">5</div>視角切換與資料隔離</div>
+  <table class="anno-table">
+    <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+    <tbody>
+      <tr><td>場域資料隔離</td><td>非 Super Admin 的使用者，API 自動過濾只回傳自己場域的資料，看不到其他場域</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>Super Admin 全域<div class="note">切換場域</div></td><td>Super Admin 可在儀表板選擇「全部」或「特定場域」，切換查看範圍</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>管理員 / 現場視角<div class="note">viewMode</div></td><td>管理員可切換「admin / field」模式，field 模式下介面跟現場人員一樣，方便預覽現場看到什麼</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>視角記憶</td><td>切換的視角記在 localStorage，下次登入維持同樣的模式</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>跨場域調度</td><td>同一員工支援跨場域調動、跨廠查看？目前未知</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+      <tr><td>ABAC 屬性隔離</td><td>例：倉管只能看自己負責的倉庫，不是整個場域。目前無此顆粒度</td><td><span class="status-pill s-todo">尚未實作</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 6. 刪除與稽核 -->
+<section class="section" id="audit">
+  <div class="section-title"><div class="num">6</div>刪除保護與稽核</div>
+  <table class="anno-table">
+    <thead><tr><th>項目</th><th>說明</th><th style="width:80px;">狀態</th></tr></thead>
+    <tbody>
+      <tr><td>Hard Delete 保護</td><td>Company / Site / FunctionalArea / User 刪除前先驗證是否有關聯資料，阻止孤兒資料產生</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>刪除稽核日誌<div class="note">DeletionLog</div></td><td>所有刪除動作寫入稽核日誌：誰刪除、何時、刪什麼、備份快照，Super Admin 可查閱</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>僅 Super Admin 可執行</td><td>刪除動作限 Super Admin，場域管理員只能停用不能刪除</td><td><span class="status-pill s-done">已確認</span></td></tr>
+      <tr><td>資料還原<div class="note">從稽核日誌</div></td><td>是否能從稽核日誌還原誤刪的資料？需確認</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+      <tr><td>一般操作稽核<div class="note">非刪除</div></td><td>新增、編輯、指派、核准等一般操作是否也有稽核軌跡？目前未知</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+      <tr><td>登入記錄</td><td>誰在何時從哪個 IP 登入，有沒有保留登入歷史？</td><td><span class="status-pill s-discuss">待確認</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 7. 未完成規劃與待確認 -->
+<section class="section" id="discuss">
+  <div class="section-title"><div class="num">7</div>未完成規劃與待確認</div>
+
+  <!-- 尚未實作的規劃功能 -->
+  <div style="margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">🔨 尚未實作的規劃功能</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-card-title">🔐 忘記密碼 / 自助重設 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">需提供 Email 驗證或手機 OTP 讓使用者自助重設密碼，目前忘記密碼只能請管理員重新設定。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">🛡️ 密碼強度規則 <span class="status-pill s-discuss">待確認</span></div>
+        <div class="feat-card-desc">建議規範最短長度、大小寫、數字、特殊字元，並提供前端即時驗證提示。需確認目前實作。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">📦 倉管角色 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">M5 備品/庫存模組上線前必須補，需要「可看哪幾個倉」的 ABAC 屬性。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">🛒 採購角色 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">M6 採購模組上線前必須補。採購核准須搭配簽核引擎。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">🔧 維修工程師角色 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">目前維修工單由 Admin 兼任指派，規劃中給維修工程師更細緻權限（接單、換件、領料）。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">🏷️ ABAC 屬性權限 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">角色決定「能做什麼操作」，屬性決定「能看哪些資料」。例：倉管 A 只能看倉庫 1、倉管 B 只能看倉庫 2。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">📝 簽核引擎 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">M6 採購核准流程需要：串聯（A→B→C）、條件式（金額分層）、並聯（多人同核）、代理人機制、催辦。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">🚫 退簽 / 撤回 / 加簽 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">搭配簽核引擎的進階功能，讓核准流程更有彈性。</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">📜 完整稽核軌跡 <span class="status-pill s-todo">尚未實作</span></div>
+        <div class="feat-card-desc">目前只有刪除稽核，其他操作（新增、編輯、指派、核准）尚無完整稽核日誌。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="discuss-box">
+    <div class="discuss-box-title">⚠️ 以下事項需與庭程 / 資訊單位確認</div>
+    <ul>
+      <li>目前密碼規則有哪些（長度、複雜度）？前端輸入時有無即時提示？</li>
+      <li>管理員建立的新帳號，使用者第一次登入是否強制改密？</li>
+      <li>一個使用者能不能同時具備多個角色（例：A 既是倉管也是維修工）？</li>
+      <li>角色權限顆粒度：目前是「模組層級」還是「CRUD 動作層級」？能否只給「讀取」不給「修改」？</li>
+      <li>有使用者在用的角色，要刪除時系統會擋嗎？還是直接刪除讓使用者失去權限？</li>
+      <li>公司、場域支援 Excel 批量匯入嗎？（設備已知支援）</li>
+      <li>Super Admin 可否跨場域調派人員？例如把五股的員工暫時調到台南支援？</li>
+      <li>稽核日誌目前只記「刪除」，其他動作（新增、修改、指派、登入）有沒有保留紀錄？</li>
+      <li>從稽核日誌能不能還原誤刪的資料？還原需要什麼權限？</li>
+      <li>JWT Token 的有效期多久？Refresh Token 機制是什麼？是否支援強制登出所有裝置？</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:24px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 18px;">
+    <div style="font-weight:700;font-size:13px;color:#1d4ed8;margin-bottom:8px;">📌 狀態說明</div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill s-done">已確認</span><span style="font-size:12px;color:var(--text2)">程式碼中已實作</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill s-partial">部分可用</span><span style="font-size:12px;color:var(--text2)">基礎存在但有缺口</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill s-todo">尚未實作</span><span style="font-size:12px;color:var(--text2)">規劃中，程式碼未實作</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill s-discuss">待確認</span><span style="font-size:12px;color:var(--text2)">需與開發者討論</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const id = link.getAttribute('href').replace('#','');
+    document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+    document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      const id = entry.target.id;
+      document.querySelectorAll('.nav-link').forEach(l => {
+        l.classList.toggle('active', l.getAttribute('href') === '#'+id);
+      });
+    }
+  });
+}, {threshold:0.2});
+document.querySelectorAll('.section').forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -18,6 +18,23 @@
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Microsoft JhengHei',system-ui,sans-serif;font-size:14px;line-height:1.6;}
 a{text-decoration:none;color:inherit;}
 
+/* 主導覽列（跨分頁切換） */
+.main-nav{
+  background:#0a0e1a;color:#fff;padding:0 48px;height:48px;
+  display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:60;
+  border-bottom:1px solid #1e293b;
+}
+.main-nav-brand{font-size:13px;font-weight:700;color:#cbd5e1;margin-right:32px;display:flex;align-items:center;gap:8px;}
+.main-nav-brand::before{content:"";display:inline-block;width:6px;height:14px;background:var(--blue);border-radius:2px;}
+.main-nav a{
+  color:#94a3b8;font-size:13px;font-weight:500;text-decoration:none;
+  padding:0 18px;height:48px;display:flex;align-items:center;
+  border-bottom:2px solid transparent;transition:all .15s;
+}
+.main-nav a:hover{color:#fff;}
+.main-nav a.active{color:#fff;background:rgba(59,130,246,.15);border-bottom-color:var(--blue);}
+.main-nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:11px;color:#64748b;}
+
 .hdr{background:linear-gradient(135deg,#1e2740 0%,#0f1117 60%);border-bottom:1px solid var(--border);padding:28px 48px 22px;}
 .hdr h1{font-size:22px;font-weight:700;color:#fff;}
 .hdr p{color:var(--text2);margin-top:4px;font-size:13px;}
@@ -39,6 +56,14 @@ main{max-width:1100px;margin:0 auto;padding:36px 48px 80px;}
 .ov-c-y .val{color:var(--yellow);}
 .ov-c-r .val{color:var(--red);}
 .ov-c-b .val{color:var(--blue);}
+.ov-card{cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+.ov-card:hover{border-color:var(--blue);box-shadow:0 0 0 2px rgba(59,130,246,.2);}
+.ov-card.active{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.35);}
+.mod-row.hidden{display:none;}
+.mod-row.highlight td{background:rgba(59,130,246,.1);}
+tr.phase-hdr.hidden{display:none;}
+.filter-hint{font-size:12px;color:var(--text2);margin-bottom:12px;min-height:18px;}
+.filter-hint span{color:var(--blue);cursor:pointer;text-decoration:underline;}
 
 /* table */
 .mod-table{width:100%;border-collapse:collapse;}
@@ -80,23 +105,34 @@ main{max-width:1100px;margin:0 auto;padding:36px 48px 80px;}
 </style>
 </head>
 <body>
+
+<nav class="main-nav">
+  <div class="main-nav-brand">智慧點檢平台</div>
+  <a href="index.html">🗺️ 系統藍圖</a>
+  <a href="系統盤點分析報告.html" class="active">📊 系統盤點總覽</a>
+  <a href="現場作業介面說明.html">👷 現場作業介面</a>
+  <a href="系統管理與權限說明.html">🔐 系統管理與權限</a>
+  <div class="main-nav-right">2026-04-24</div>
+</nav>
+
 <div class="hdr">
   <h1>智慧設備維保平台 — 系統盤點報告</h1>
   <p>點擊模組列查看詳細進度與實作規劃 · 2026-04-23</p>
   <div class="badge-row">
     <span class="badge b-blue">現有系統：Intelligent-Inspection-Platform</span>
     <span class="badge b-green">目標：智慧設備維保與備品協同管理平台 v2.0</span>
-    <span class="badge b-yellow">整體完成度 ~32%</span>
+    <span class="badge b-yellow" id="badge-pct">整體完成度 ~…</span>
   </div>
 </div>
 
 <main>
-  <div class="ov-grid">
-    <div class="ov-card ov-c-g"><div class="lbl">已有功能模組</div><div class="val">9</div><div class="sub">具備部分功能</div></div>
-    <div class="ov-card ov-c-y"><div class="lbl">整體完成度</div><div class="val">32%</div><div class="sub">對應藍圖 Phase 1 約 60%</div></div>
-    <div class="ov-card ov-c-r"><div class="lbl">完全缺失模組</div><div class="val">3</div><div class="sub">M5 備品 / M6 採購 / IoT</div></div>
-    <div class="ov-card ov-c-b"><div class="lbl">預估補全時程</div><div class="val">12mo</div><div class="sub">Phase 1+2 完整補全</div></div>
+  <div class="ov-grid" id="ov-grid">
+    <div class="ov-card ov-c-g" id="card-has" title="點擊查看有功能的模組"><div class="lbl">已有功能模組</div><div class="val" id="val-has">—</div><div class="sub">具備部分功能（點擊篩選）</div></div>
+    <div class="ov-card ov-c-y" id="card-all" title="點擊顯示所有模組"><div class="lbl">整體完成度</div><div class="val" id="val-pct">—</div><div class="sub" id="sub-pct">點擊顯示所有模組</div></div>
+    <div class="ov-card ov-c-r" id="card-missing" title="點擊查看完全缺失的模組"><div class="lbl">完全缺失模組</div><div class="val" id="val-miss">—</div><div class="sub" id="sub-miss">點擊篩選</div></div>
+    <div class="ov-card ov-c-b" id="card-time" title="點擊查看各階段說明"><div class="lbl">預估補全時程</div><div class="val">12mo</div><div class="sub">P0(4w)+P1(5m)+P2(4m)+P3(6m)≈12m</div></div>
   </div>
+  <div class="filter-hint" id="filter-hint"></div>
 
   <table class="mod-table" id="mod-table">
     <thead>
@@ -120,7 +156,22 @@ const phaseInfo = {
   3:{label:'Phase 3 · 智慧升級（4~6 個月）',     rowBg:'rgba(239,68,68,.06)',   color:'#fda4af', cls:'pt-3'},
 };
 
+// --- 統計數字動態計算 ---
+const hasModules   = MODULES.filter(m => m.pct > 0);
+const missModules  = MODULES.filter(m => m.pct === 0);
+const avgPct = Math.round(MODULES.reduce((s,m)=>s+m.pct,0) / MODULES.length);
+
+document.getElementById('val-has').textContent  = hasModules.length;
+document.getElementById('val-miss').textContent = missModules.length;
+document.getElementById('val-pct').textContent  = avgPct + '%';
+document.getElementById('sub-miss').textContent =
+  missModules.map(m=>m.title.split('·')[0].trim()||m.title).join(' / ');
+document.getElementById('badge-pct').textContent = `整體完成度 ~${avgPct}%`;
+
+// --- 建立表格 ---
 const tbody = document.getElementById('tbody');
+const rowMap = {};   // id → <tr>
+const phaseHdrMap = {}; // phase → <tr>
 let lastPhase = -1;
 
 MODULES.forEach(m => {
@@ -129,7 +180,9 @@ MODULES.forEach(m => {
     const pi = phaseInfo[m.phase];
     const hdr = document.createElement('tr');
     hdr.className = 'phase-hdr';
+    hdr.dataset.phase = m.phase;
     hdr.innerHTML = `<td colspan="4"><div class="phase-hdr-inner" style="background:${pi.rowBg};color:${pi.color};">${pi.label}</div></td>`;
+    phaseHdrMap[m.phase] = hdr;
     tbody.appendChild(hdr);
   }
 
@@ -137,6 +190,9 @@ MODULES.forEach(m => {
   const pi = phaseInfo[m.phase];
   const tr = document.createElement('tr');
   tr.className = 'mod-row';
+  tr.dataset.id = m.id;
+  tr.dataset.pct = m.pct;
+  tr.dataset.phase = m.phase;
   tr.innerHTML = `
     <td>
       <div class="mod-name">${m.title}</div>
@@ -154,8 +210,60 @@ MODULES.forEach(m => {
   tr.addEventListener('click', () => {
     window.location.href = `module-detail.html#${m.id}`;
   });
+  rowMap[m.id] = tr;
   tbody.appendChild(tr);
 });
+
+// --- 篩選功能 ---
+let activeCard = null;
+
+function applyFilter(filterFn, label) {
+  const rows = document.querySelectorAll('.mod-row');
+  const phaseHdrs = document.querySelectorAll('.phase-hdr');
+
+  rows.forEach(r => {
+    const show = filterFn(r);
+    r.classList.toggle('hidden', !show);
+  });
+
+  // 若一個 phase 底下所有 row 都隱藏，也隱藏該 phase header
+  phaseHdrs.forEach(hdr => {
+    const phase = hdr.dataset.phase;
+    const anyVisible = [...rows].some(r => r.dataset.phase === phase && !r.classList.contains('hidden'));
+    hdr.classList.toggle('hidden', !anyVisible);
+  });
+
+  const hint = document.getElementById('filter-hint');
+  const visible = [...rows].filter(r => !r.classList.contains('hidden')).length;
+  hint.innerHTML = label
+    ? `篩選中：${label}（${visible} 個模組）&nbsp;·&nbsp;<span onclick="clearFilter()">清除篩選</span>`
+    : '';
+}
+
+function clearFilter() {
+  document.querySelectorAll('.mod-row').forEach(r => r.classList.remove('hidden'));
+  document.querySelectorAll('.phase-hdr').forEach(h => h.classList.remove('hidden'));
+  document.getElementById('filter-hint').innerHTML = '';
+  document.querySelectorAll('.ov-card').forEach(c => c.classList.remove('active'));
+  activeCard = null;
+}
+
+function bindCard(cardId, filterFn, label) {
+  const card = document.getElementById(cardId);
+  card.addEventListener('click', () => {
+    if (activeCard === cardId) { clearFilter(); return; }
+    document.querySelectorAll('.ov-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    activeCard = cardId;
+    applyFilter(filterFn, label);
+  });
+}
+
+bindCard('card-has',     r => parseInt(r.dataset.pct) > 0, '已有功能模組');
+bindCard('card-missing', r => parseInt(r.dataset.pct) === 0, '完全缺失模組');
+bindCard('card-all',     () => true, '');
+bindCard('card-time',    () => true, '');
+
 </script>
 </body>
 </html>
